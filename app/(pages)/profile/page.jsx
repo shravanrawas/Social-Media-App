@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Userposts from "@/components/Userposts";
 
 function SkeletonLoader() {
   return (
@@ -171,18 +172,7 @@ function ProfilePage() {
             </TabsList>
 
             <TabsContent value="posts">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-             
-                {[...Array(9)].map((_, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={`https://randomuser.me/api/portraits/men/46.jpg`}
-                      alt={`Post ${index + 1}`}
-                      className="w-full h-auto rounded-lg"
-                    />
-                  </div>
-                ))}
-              </div>
+              <Userposts userId={userId}/>
             </TabsContent>
 
             <TabsContent value="followers">

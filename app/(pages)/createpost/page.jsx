@@ -63,7 +63,6 @@ function Createpostpage() {
         imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${data.path}`;
       }
 
-      
       const { error } = await supabase.from("posts").insert([
         {
           user_id: user.id,
@@ -73,8 +72,8 @@ function Createpostpage() {
       ]);
 
       if (error) {
-        throw new Error("Error inserting post");
         setLoading(false);
+        throw new Error("Error inserting post");
       }
 
       toast.success("Post uploaded successfully!");
