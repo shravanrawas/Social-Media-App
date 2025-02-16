@@ -1,16 +1,17 @@
-"use client";
+'use client'
 
+import React, { Suspense, useEffect, useState } from "react";
 import { getUserData, followUser, unfollowUser } from "@/actions/UserApi";
 import { useFetch } from "@/hooks/useFetch";
 import { getUser, signOut } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Userposts from "@/components/Userposts";
-import TotalFollowCount from "@/components/TotalFollowCount";
+
+const Userposts = React.lazy(() => import("@/components/Userposts"));
+const TotalFollowCount = React.lazy(() => import("@/components/TotalFollowCount"));
 
 function SkeletonLoader() {
   return (
@@ -43,14 +44,14 @@ function ProfilePage() {
     fn(userId);
   }, [userId]);
 
-   const handleSignOut = async () => {
-      try {
-        await signOut();
-        router.push("/login");
-      } catch (error) {
-        console.error("Sign out failed:", error);
-      }
-    };
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -150,7 +151,9 @@ function ProfilePage() {
             </div>
           </div>
 
-          <TotalFollowCount userId={userId}/>
+          <Suspense fallback={<SkeletonLoader />}>
+            <TotalFollowCount userId={userId} />
+          </Suspense>
 
           <Tabs defaultValue="posts" className="w-full">
             <TabsList className="flex justify-center gap-4">
@@ -158,7 +161,9 @@ function ProfilePage() {
             </TabsList>
 
             <TabsContent value="posts">
-              <Userposts userId={userId}/>
+              <Suspense fallback={<p>Loading posts...</p>}>
+                <Userposts userId={userId} />
+              </Suspense>
             </TabsContent>
           </Tabs>
         </>
