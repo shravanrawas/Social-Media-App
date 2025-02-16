@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { getUser } from "@/lib/auth";
-import { LoaderCircle, Pencil, Trash, X } from "lucide-react";
+import { LoaderCircle, Trash, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 function Userposts({ userId }) {
@@ -74,7 +74,6 @@ function Userposts({ userId }) {
       {selectedPost && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
           <div className="bg-white rounded-lg p-6 relative w-[500px] h-[600px]">
-           
             <button
               className="absolute top-2 right-2 bg-gray-300 p-1 rounded-full"
               onClick={() => setSelectedPost(null)}
@@ -82,20 +81,17 @@ function Userposts({ userId }) {
               <X size={18} className="text-gray-700" />
             </button>
 
-          
             <img
               src={selectedPost.image_url}
               alt="Selected Post"
               className="w-full h-[450px] object-cover rounded-lg"
             />
 
-           
             <p className="mt-2 text-center font-semibold text-gray-800">
               {selectedPost.title}
             </p>
 
-           
-            {!userId && (
+            {(!userId || userId == user.id) && (
               <div className="flex justify-end mt-2">
                 <button
                   onClick={() => handleDelete(selectedPost.id)}

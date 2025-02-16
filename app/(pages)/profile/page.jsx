@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Userposts from "@/components/Userposts";
+import TotalFollowCount from "@/components/TotalFollowCount";
 
 function SkeletonLoader() {
   return (
@@ -149,62 +150,15 @@ function ProfilePage() {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow-md mb-6 grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">Followers</h3>
-              <p className="text-gray-600">{UserData.followers || 0}</p>
-            </div>
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">Following</h3>
-              <p className="text-gray-600">{UserData.following || 0}</p>
-            </div>
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">Posts</h3>
-              <p className="text-gray-600">{UserData.posts || 0}</p>
-            </div>
-          </div>
+          <TotalFollowCount userId={userId}/>
 
           <Tabs defaultValue="posts" className="w-full">
             <TabsList className="flex justify-center gap-4">
               <TabsTrigger value="posts">Posts</TabsTrigger>
-              <TabsTrigger value="followers">Followers</TabsTrigger>
-              <TabsTrigger value="following">Following</TabsTrigger>
             </TabsList>
 
             <TabsContent value="posts">
               <Userposts userId={userId}/>
-            </TabsContent>
-
-            <TabsContent value="followers">
-              <div className="grid grid-cols-3 gap-4">
-               
-                {[...Array(6)].map((_, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <img
-                      src={`https://randomuser.me/api/portraits/men/46.jpg`}
-                      alt={`User ${index + 1}`}
-                      className="w-16 h-16 object-cover rounded-full mb-2"
-                    />
-                    <p>User {index + 1}</p>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="following">
-              <div className="grid grid-cols-3 gap-4">
-              
-                {[...Array(6)].map((_, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <img
-                      src={`https://randomuser.me/api/portraits/men/46.jpg`}
-                      alt={`User ${index + 1}`}
-                      className="w-16 h-16 object-cover rounded-full mb-2"
-                    />
-                    <p>User {index + 1}</p>
-                  </div>
-                ))}
-              </div>
             </TabsContent>
           </Tabs>
         </>

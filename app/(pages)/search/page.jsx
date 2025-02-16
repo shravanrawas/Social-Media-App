@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 function Searchpage() {
+
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
   const router = useRouter();
-
   
   useEffect(() => {
     const fetchUsers = async () => {
@@ -27,7 +27,6 @@ function Searchpage() {
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
 
   const handleUserClick = (userId) => {
     router.push(`/profile?userId=${userId}`);

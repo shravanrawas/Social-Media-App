@@ -10,9 +10,10 @@ function PostFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [comments, setComments] = useState({}); // Track comments per post
-  const [newComment, setNewComment] = useState({}); // Track comment input per post
-  const [likes, setLikes] = useState({}); // Track likes per post
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState({});
+  const [likes, setLikes] = useState({});
+  const [commentVisible, setCommentVisible] = useState({});
 
   useEffect(() => {
     fetchPosts();
@@ -63,65 +64,50 @@ function PostFeed() {
   const fetchCommentsAndLikes = async (postsData) => {
     const postIds = postsData.map((post) => post.id);
 
-    // Fetch comments for all posts
     const { data: commentData, error: commentError } = await supabase
       .from("comments")
-      .select("*")
+      .select("*, users(username, avatar_url)")
       .in("post_id", postIds);
 
-    if (commentError) {
-      console.error("Error fetching comments:", commentError);
-    }
+    if (commentError) console.error("Error fetching comments:", commentError);
 
     const commentsMap = {};
     commentData?.forEach((comment) => {
-      if (!commentsMap[comment.post_id]) {
-        commentsMap[comment.post_id] = [];
-      }
+      if (!commentsMap[comment.post_id]) commentsMap[comment.post_id] = [];
       commentsMap[comment.post_id].push(comment);
     });
     setComments(commentsMap);
 
-    // Fetch likes for all posts
     const { data: likeData, error: likeError } = await supabase
       .from("likes")
       .select("post_id, user_id");
 
-    if (likeError) {
-      console.error("Error fetching likes:", likeError);
-    }
+    if (likeError) console.error("Error fetching likes:", likeError);
 
     const likesMap = {};
     likeData?.forEach((like) => {
-      if (!likesMap[like.post_id]) {
-        likesMap[like.post_id] = [];
-      }
+      if (!likesMap[like.post_id]) likesMap[like.post_id] = [];
       likesMap[like.post_id].push(like.user_id);
     });
     setLikes(likesMap);
   };
 
   const handleAddComment = async (postId) => {
-    const commentText = newComment[postId]?.trim();
-    if (!commentText || !user) return;
+    if (!newComment[postId]?.trim() || !user) return;
 
     const { data, error } = await supabase
       .from("comments")
-      .insert([{ post_id: postId, user_id: user.id, content: commentText }]);
+      .insert([
+        { post_id: postId, user_id: user.id, content: newComment[postId] },
+      ]);
 
     if (error) {
       console.error("Error adding comment:", error);
       return;
     }
 
-    setComments((prevComments) => ({
-      ...prevComments,
-      [postId]: [...(prevComments[postId] || []), data[0]],
-    }));
-    setNewComment((prevNewComment) => ({
-      ...prevNewComment,
-      [postId]: "",
-    }));
+    fetchCommentsAndLikes(posts);
+    setNewComment({ ...newComment, [postId]: "" });
   };
 
   const handleToggleLike = async (postId) => {
@@ -205,16 +191,15 @@ function PostFeed() {
               <span>{likes[post.id]?.length || 0} Likes</span>
             </button>
             <button
+              className="flex gap-1 items-center space-x-1 text-gray-600 hover:text-blue-500"
               onClick={() =>
-                setNewComment((prev) => ({
+                setCommentVisible((prev) => ({
                   ...prev,
-                  [post.id]: prev[post.id] ? "" : " ",
+                  [post.id]: !prev[post.id],
                 }))
               }
-              className="flex items-center space-x-1 text-gray-600 hover:text-blue-500"
             >
-              <Send size={18} />
-              <span>Comment</span>
+              <Send size={18} /> Comment
             </button>
             <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-500">
               <Share size={18} />
@@ -222,33 +207,49 @@ function PostFeed() {
             </button>
           </div>
 
-          {newComment[post.id] !== undefined && (
-            <div className="mt-4">
-              <div className="flex items-center space-x-2">
+          {commentVisible[post.id] && (
+            <div className="mt-4 bg-gray-100 p-4 rounded-lg shadow-sm">
+              {/* Comment Input */}
+              <div className="flex gap-2 items-center">
                 <input
                   type="text"
                   value={newComment[post.id] || ""}
                   onChange={(e) =>
-                    setNewComment({
-                      ...newComment,
-                      [post.id]: e.target.value,
-                    })
+                    setNewComment({ ...newComment, [post.id]: e.target.value })
                   }
                   placeholder="Write a comment..."
-                  className="flex-1 p-2 border border-gray-300 rounded-lg"
+                  className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 <button
                   onClick={() => handleAddComment(post.id)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                 >
                   Post
                 </button>
               </div>
 
-              <div className="mt-4 space-y-2">
+           
+              <div className="mt-3 max-h-80 overflow-y-auto space-y-3">
                 {comments[post.id]?.map((comment) => (
-                  <div key={comment.id} className="text-sm text-gray-700">
-                    <strong>{comment.user_id}: </strong> {comment.content}
+                  <div
+                    key={comment.id}
+                    className="flex items-start space-x-3 bg-white p-3 rounded-lg shadow"
+                  >
+                    <img
+                      src={comment.users?.avatar_url || "/default-avatar.png"}
+                      className="w-10 h-10 object-cover rounded-full border border-gray-300"
+                      alt="User Avatar"
+                    />
+                    <div className="flex-1">
+                      <span className="font-semibold text-sm text-gray-700">
+                        {comment.users?.username || "Unknown"}
+                      </span>
+                      <p className="text-gray-600 text-sm break-words">
+                        {comment.content.length > 30
+                          ? `${comment.content.slice(0, 30)}...`
+                          : comment.content}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

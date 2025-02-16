@@ -25,7 +25,6 @@ function Homepage() {
   const [stories, setStories] = useState([]);
   const [currentUsername, setCurrentUsername] = useState('');
   const [loading, setLoading] = useState();
-
   
 
   useEffect(() => {
@@ -61,7 +60,7 @@ function Homepage() {
   const handleUploadStory = async () => {
     setLoading(true);
     if (!selectedFile) {
-      alert("Please select a file first.");
+      toast.error("Please select a file first.");
       setLoading(false);
       return;
     }
