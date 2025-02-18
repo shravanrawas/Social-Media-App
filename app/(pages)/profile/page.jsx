@@ -32,7 +32,7 @@ function SkeletonLoader() {
   );
 }
 
-function ProfilePage() {
+function ProfileContent() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const searchParams = useSearchParams();
@@ -171,6 +171,14 @@ function ProfilePage() {
         <p>No user data available</p>
       )}
     </div>
+  );
+}
+
+function ProfilePage() {
+  return (
+    <Suspense fallback={<div>Loading profile...</div>}>
+      <ProfileContent />
+    </Suspense>
   );
 }
 
