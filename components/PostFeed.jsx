@@ -156,10 +156,12 @@ function PostFeed() {
                 alt="User Avatar"
                 className="w-10 h-10 rounded-full object-cover"
               />
-              <span className="font-semibold">{post.user.username}</span>
+             <div className="flex justify-between items-center w-full">
+             <span className="font-semibold">{post.user.username}</span>
               <span className="text-gray-500 text-sm">
-                {new Date(post.created_at).toLocaleString()}
+              {new Date(post.created_at).toLocaleDateString()}
               </span>
+             </div>
             </div>
           </Link>
 
