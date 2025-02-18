@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { Suspense, useEffect, useState } from "react";
 import { getUserData, followUser, unfollowUser } from "@/actions/UserApi";
@@ -41,17 +41,8 @@ function ProfilePage() {
   const { data: UserData, fn, loading } = useFetch(getUserData);
 
   useEffect(() => {
-    fn(userId);
-  }, [userId]);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.push("/login");
-    } catch (error) {
-      console.error("Sign out failed:", error);
-    }
-  };
+    if (userId) fn(userId);
+  }, [userId, fn]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,11 +54,11 @@ function ProfilePage() {
       }
     };
     fetchUser();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const checkFollowStatus = async () => {
-      if (!authenticatedUser) return;
+      if (!authenticatedUser || !userId) return;
       const { data, error } = await supabase
         .from("followers")
         .select("*")
@@ -93,7 +84,16 @@ function ProfilePage() {
     }
   };
 
-  const isCurrentUser = authenticatedUser && UserData && authenticatedUser.id === UserData.id;
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
+
+  const isCurrentUser = authenticatedUser?.id === UserData?.id;
 
   return (
     <div className="container mx-auto p-4">
@@ -159,7 +159,6 @@ function ProfilePage() {
             <TabsList className="flex justify-center gap-4">
               <TabsTrigger value="posts">Posts</TabsTrigger>
             </TabsList>
-
             <TabsContent value="posts">
               <Suspense fallback={<p>Loading posts...</p>}>
                 <Userposts userId={userId} />
