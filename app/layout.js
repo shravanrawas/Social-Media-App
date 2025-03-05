@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({subsets: ['latin']});
 
 export const metadata = {
-  title: "Socialo",
+  title: "Socialo - Connect with world",
   description: "social media for everyone",
 };
 

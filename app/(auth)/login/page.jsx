@@ -25,6 +25,7 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
+    document.title = "Socialo - Login";
     const fetchUser = async () => {
       const userData = await getUser();
       if (userData) router.push("/home");
